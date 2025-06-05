@@ -114,19 +114,53 @@ function SignUpForm() {
   const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
   const [ktpPhotoFile, setKtpPhotoFile] = useState<File | null>(null);
 
-  // Function to simulate AI bio generation
+  // Function to generate bio using your provided API endpoint
   const handleGenerateBio = async () => {
     setIsGeneratingBio(true);
-    console.log("Generating bio...");
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500)); 
-    
-    // Placeholder AI generated bio based on other fields   
-    const generatedText = `Saya adalah ${name || 'seseorang'} dari ${city || 'dunia maya'} yang berusia ${dob ? new Date().getFullYear() - new Date(dob).getFullYear() : 'tidak diketahui'} tahun. Hobi saya meliputi ${hobby || 'berbagai aktivitas menarik'}. Saya mencari koneksi tulus di sini.`;
-    
-    setBio(generatedText);
-    setIsGeneratingBio(false);
-    console.log("Bio generated!");
+    setBio("Generating bio..."); // Show generating message immediately
+
+    try {
+      // Construct the request body from form inputs
+      const requestBody = {
+        name: name || '',
+        birth_date: dob || '', // Ensure format matches 'YYYY-MM-DD'
+        gender: gender || '',
+        city: city || '',
+        hobbies: hobby || '' // This should be comma-separated already from user input
+      };
+
+      console.log(requestBody);
+
+      const apiUrl = "https://project-tbc.onrender.com/generate-bio";
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        // Handle HTTP errors
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Assuming the API returns a JSON object with a 'bio' key
+      if (result && result.bio) {
+        setBio(result.bio);
+      } else {
+        setBio("Gagal menghasilkan bio. Coba lagi atau tulis manual.");
+        console.error("API returned unexpected structure or no bio content:", result);
+      }
+
+    } catch (error) {
+      console.error("Error calling generate-bio API:", error);
+      setBio(`Gagal menghasilkan bio: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setIsGeneratingBio(false);
+    }
   };
 
   // Handle file input changes
