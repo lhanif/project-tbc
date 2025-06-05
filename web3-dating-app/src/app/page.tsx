@@ -2,26 +2,29 @@
 
 import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
-import thirdwebIcon from "@public/thirdweb.svg";
+import thirdwebIcon from "@public/thirdweb.svg"; // Assuming you still want to use this icon for branding
 import { client } from "./client";
 
 export default function Home() {
   return (
     <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
-      <div className="py-20">
+      <div className="py-20 flex flex-col items-center">
         <Header />
 
-        <div className="flex justify-center mb-20">
+        <div className="flex flex-col items-center mb-8">
+          <p className="text-zinc-300 text-lg mb-4 text-center">
+            Connect your wallet to find your perfect match!
+          </p>
           <ConnectButton
             client={client}
             appMetadata={{
-              name: "Example App",
-              url: "https://example.com",
+              name: "Chain Match", // Dating app name
+              url: "https://web3love.com", // Your dating app URL
             }}
           />
         </div>
 
-        <ThirdwebResources />
+        <HowItWorks />
       </div>
     </main>
   );
@@ -29,72 +32,66 @@ export default function Home() {
 
 function Header() {
   return (
-    <header className="flex flex-col items-center mb-20 md:mb-20">
+    <header className="flex flex-col items-center mb-12 md:mb-16">
       <Image
-        src={thirdwebIcon}
-        alt=""
-        className="size-[150px] md:size-[150px]"
+        src={thirdwebIcon} // You might want to replace this with a dating app specific logo
+        alt="Web3Love Logo"
+        className="size-[120px] md:size-[150px] mb-4"
         style={{
-          filter: "drop-shadow(0px 0px 24px #a726a9a8)",
+          filter: "drop-shadow(0px 0px 24px #e91e63a8)", // Pinkish shadow for dating app theme
         }}
       />
 
-      <h1 className="text-2xl md:text-6xl font-semibold md:font-bold tracking-tighter mb-6 text-zinc-100">
-        thirdweb SDK
-        <span className="text-zinc-300 inline-block mx-1"> + </span>
-        <span className="inline-block -skew-x-6 text-blue-500"> Next.js </span>
+      <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4 text-zinc-100 text-center">
+        Chain<span className="text-pink-500">Match</span>
       </h1>
 
-      <p className="text-zinc-300 text-base">
-        Read the{" "}
-        <code className="bg-zinc-800 text-zinc-300 px-2 rounded py-1 text-sm mx-1">
-          README.md
-        </code>{" "}
-        file to get started.
+      <p className="text-zinc-300 text-base text-center max-w-md">
+        The decentralized dating app where connections are made on the blockchain.
       </p>
     </header>
   );
 }
 
-function ThirdwebResources() {
+function HowItWorks() {
   return (
-    <div className="grid gap-4 lg:grid-cols-3 justify-center">
-      <ArticleCard
-        title="thirdweb SDK Docs"
-        href="https://portal.thirdweb.com/typescript/v5"
-        description="thirdweb TypeScript SDK documentation"
-      />
+    <div className="mt-16 w-full max-w-2xl">
+      <h2 className="text-2xl md:text-3xl font-semibold text-zinc-100 text-center mb-8">
+        How it Works
+      </h2>
+      <div className="grid gap-6 md:grid-cols-3 justify-center">
+        <ArticleCard
+          title="1. Connect Your Wallet"
+          description="Securely log in with your preferred crypto wallet. No personal data required."
+          icon="💖" // Heart emoji
+        />
 
-      <ArticleCard
-        title="Components and Hooks"
-        href="https://portal.thirdweb.com/typescript/v5/react"
-        description="Learn about the thirdweb React components and hooks in thirdweb SDK"
-      />
+        <ArticleCard
+          title="2. Create Your Profile"
+          description="Build your on-chain profile with your interests and preferences."
+          icon="✨" // Sparkles emoji
+        />
 
-      <ArticleCard
-        title="thirdweb Dashboard"
-        href="https://thirdweb.com/dashboard"
-        description="Deploy, configure, and manage your smart contracts from the dashboard."
-      />
+        <ArticleCard
+          title="3. Find Your Match"
+          description="Discover compatible profiles and start building meaningful connections."
+          icon="💘" // Heart with arrow emoji
+        />
+      </div>
     </div>
   );
 }
 
 function ArticleCard(props: {
   title: string;
-  href: string;
   description: string;
+  icon: string;
 }) {
   return (
-    <a
-      href={props.href + "?utm_source=next-template"}
-      target="_blank"
-      className="flex flex-col border border-zinc-800 p-4 rounded-lg hover:bg-zinc-900 transition-colors hover:border-zinc-700"
-    >
-      <article>
-        <h2 className="text-lg font-semibold mb-2">{props.title}</h2>
-        <p className="text-sm text-zinc-400">{props.description}</p>
-      </article>
-    </a>
+    <div className="flex flex-col items-center text-center border border-zinc-800 p-6 rounded-lg hover:bg-zinc-900 transition-colors hover:border-pink-700 h-full">
+      <div className="text-5xl mb-4">{props.icon}</div>
+      <h3 className="text-xl font-semibold mb-2 text-zinc-100">{props.title}</h3>
+      <p className="text-sm text-zinc-400">{props.description}</p>
+    </div>
   );
 }
