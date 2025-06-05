@@ -1,6 +1,6 @@
 "use client"; // This directive is necessary for Next.js App Router client components
 
-import React, { useState } from "react"; // Import useState
+import React, { useState, useEffect } from "react"; // Import useState
 import Image from "next/image";
 
 // Assuming you have your Chain Match logo image in the public folder.
@@ -25,13 +25,35 @@ interface ChatContact {
 
 export default function ChatListPage() { // Renamed from Home to ChatListPage
   // Sample chat contacts
-  const [chatContacts, setChatContacts] = useState<ChatContact[]>([
-    { id: 1, name: "NeonNessa", imageUrl: "", lastMessage: "Hey, apa kabar?", lastMessageTime: "10:30 AM" },
-    { id: 2, name: "SynthSam", imageUrl:"", lastMessage: "Sudah siap nge-match?", lastMessageTime: "Yesterday" },
-    { id: 3, name: "PixelPriya", imageUrl: "", lastMessage: "Sampai jumpa nanti!", lastMessageTime: "2 days ago" },
-    { id: 4, name: "VoltVic", imageUrl: "", lastMessage: "Ok, see you!", lastMessageTime: "Wed" },
-    { id: 5, name: "GlowGreg", imageUrl: "", lastMessage: "Great to connect!", lastMessageTime: "Mar 15" },
-  ]);
+  const [chatContacts, setChatContacts] = useState<ChatContact[]>([]);
+  const userIdSaya = "1";
+  
+  useEffect(() => {
+    async function fetchChatList() {
+      try {
+        const res = await fetch(`/api/match?userIdSaya=${userIdSaya}`);
+        if (!res.ok) throw new Error("Gagal fetch daftar match");
+
+        const data = await res.json();
+        const pasanganIds = data.pasangan;
+
+        // Simulasikan ambil detail user dari pasanganIds
+        const fakeProfiles: ChatContact[] = pasanganIds.map((id: string, idx: number) => ({
+          id,
+          name: `User ${idx + 1}`,
+          imageUrl: "",
+          lastMessage: "Belum ada pesan",
+          lastMessageTime: "Just now",
+        }));
+
+        setChatContacts(fakeProfiles);
+      } catch (err) {
+        console.error("Gagal mengambil daftar chat:", err);
+      }
+    }
+
+    fetchChatList();
+  }, []);
 
   // Function to simulate navigating to a specific chat (e.g., /chat/[id])
   const handleOpenChat = (contactId: number, contactName: string) => {

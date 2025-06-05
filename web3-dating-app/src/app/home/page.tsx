@@ -26,37 +26,48 @@ interface Match {
 export default function Home() {
   // Array of potential profiles
   const [allProfiles, setAllProfiles] = useState<Match[]>([
-    { id: 1, name: "Luna", age: 26, city: "Cyber City", imageUrl: "" },
-    { id: 2, name: "Astro", age: 28, city: "Neon District", imageUrl: "" },
-    { id: 3, name: "Kira", age: 24, city: "Data Stream", imageUrl: "" },
+    { id: 2, name: "Luna", age: 26, city: "Cyber City", imageUrl: "" },
+    { id: 3, name: "Astro", age: 28, city: "Neon District", imageUrl: "" },
+    { id: 4, name: "Kira", age: 24, city: "Data Stream", imageUrl: "" },
     // Add more profiles here for demonstration
   ]);
 
-  // Index of the currently displayed profile
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
 
-  // Get the current profile to display
   const currentProfile = allProfiles[currentProfileIndex];
 
-  // Function to handle like/dislike (swiping)
-  const handleSwipe = (direction: 'like' | 'dislike') => {
-    console.log(`Swiped ${direction} on ${currentProfile?.name || 'unknown profile'}`);
+  
+  const handleSwipe = async (direction: 'like' | 'dislike') => {
+  console.log(`Swiped ${direction} on ${currentProfile?.name || 'unknown profile'}`);
 
-    // In a real app:
-    // - Send 'like'/'dislike' data to a backend/smart contract for currentProfile.id
-    // - Implement matching logic (if both liked, add to chat list)
+  if (direction === 'like' && currentProfile) {
+    try {
+      const response = await fetch('/api/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userIdSaya: '1', // ganti nanti dengan user id dari auth
+          userIdPasangan: currentProfile.id.toString(),
+        }),
+      });
 
-    // Move to the next profile
-    if (currentProfileIndex < allProfiles.length - 1) {
-      setCurrentProfileIndex(prev => prev + 1);
-    } else {
-      // No more profiles, reset or load more
-      console.log("Tidak ada calon pasangan lain saat ini.");
-      // For demo, we can loop or show a "no more matches" message
-      // setCurrentProfileIndex(0); // uncomment to loop back
-      setCurrentProfileIndex(-1); // Indicate no profiles left
+      const data = await response.json();
+      console.log('Respon dari API Like:', data.message || data.error);
+    } catch (err) {
+      console.error('Gagal mengirim like:', err);
     }
-  };
+  }
+
+  // Lanjut ke profile berikutnya
+  if (currentProfileIndex < allProfiles.length - 1) {
+    setCurrentProfileIndex(prev => prev + 1);
+  } else {
+    console.log("Tidak ada calon pasangan lain saat ini.");
+    setCurrentProfileIndex(-1);
+  }
+};
 
   // Function to navigate to chat page
   const handleGoToChatPage = () => {
