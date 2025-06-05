@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
 import thirdwebIcon from "@public/thirdweb.svg"; // Assuming you still want to use this icon for branding
 import { client } from "./client";
+import Verify from "@/components/verify";
 
 export default function Home() {
   return (
@@ -23,7 +24,7 @@ export default function Home() {
             }}
           />
         </div>
-
+        <Verify userAddress="0x03e9BB1D7B78aBEE7DE2B12A6c61D82e6A2115fb"/>
         <HowItWorks />
       </div>
     </main>

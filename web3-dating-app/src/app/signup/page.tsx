@@ -102,17 +102,17 @@ function Header() {
 
 function SignUpForm() {
   // State variables for each form field
-  const [name, setName] = useState("");
-  const [gender, setGender] = useState("");
-  const [city, setCity] = useState("");
-  const [hobby, setHobby] = useState("");
-  const [dob, setDob] = useState(""); // Date of Birth (Tanggal Lahir)
-  const [bio, setBio] = useState(""); // State for Bio field
-  const [isGeneratingBio, setIsGeneratingBio] = useState(false); // State for loading indicator
+    const [wallet, setWallet] = useState("");
+    const [name, setName] = useState("");
+    const [dob, setDob] = useState(""); // format yyyy-mm-dd
+    const [gender, setGender] = useState("");
+    const [city, setCity] = useState("");
+    const [hobby, setHobby] = useState(""); // string dipisahkan koma
+    const [bio, setBio] = useState("");
+    const [ktpFile, setKtpFile] = useState<File | null>(null);
+    const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+    const [isGeneratingBio, setIsGeneratingBio] = useState(false); // State to track bio generation status
 
-  // New states for file inputs
-  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
-  const [ktpPhotoFile, setKtpPhotoFile] = useState<File | null>(null);
 
   // Function to simulate AI bio generation
   const handleGenerateBio = async () => {
@@ -140,31 +140,51 @@ function SignUpForm() {
 
   const handleKtpPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setKtpPhotoFile(e.target.files[0]);
+      setKtpFile(e.target.files[0]);
     } else {
-      setKtpPhotoFile(null);
+      setKtpFile(null);
     }
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => { // Use React.FormEvent for better typing
-    e.preventDefault(); // Prevent default form submission behavior
-    // Log all form data to the console for demonstration
-    console.log("Signup Form Data:", {
-      name,
-      dob,
-      gender,
-      city,
-      hobby, // Hobby is expected to be comma-separated
-      bio, // Include the new bio field
-      profilePhoto: profilePhotoFile ? profilePhotoFile.name : 'No file selected',
-      ktpPhoto: ktpPhotoFile ? ktpPhotoFile.name : 'No file selected',
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!ktpFile || !profilePhotoFile) {
+    alert("Wallet, KTP, dan Foto Profil wajib diisi.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("wallet","0x5B522B7542c750Dc136c63e5fF68bE9f3B6f82B6");
+  formData.append("fullName", name);
+  formData.append("dob", dob);
+  formData.append("gender", gender);
+  formData.append("city", city);
+  formData.append("hobbies", hobby); // Komma-separated string
+  formData.append("bio", bio);
+  formData.append("ktp", ktpFile); // File object
+  formData.append("profilePicture", profilePhotoFile); // File object
+
+  try {
+    const res = await fetch("/api/verify-id", {
+      method: "POST",
+      body: formData,
     });
-    // In a real application, you would send this data (including files) to a backend or a storage service.
-    // IMPORTANT: Replace this alert with a custom modal/toast notification.
-    // alerts are blocked in the Canvas environment.
-    alert("Form submitted! Check console for data. (This is a placeholder)");
-  };
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.error || "Terjadi kesalahan saat verifikasi.");
+    }
+
+    console.log("Verifikasi berhasil:", result);
+    alert("Verifikasi berhasil! Tx Hash: " + result.txHash);
+  } catch (err) {
+    console.error("Gagal verifikasi:", err);
+    alert("Verifikasi gagal: " + err);
+  }
+};
 
   return (
     // Signup form container with neon borders and background
@@ -325,8 +345,8 @@ function SignUpForm() {
                 className="w-full p-2 text-sm bg-gray-800 bg-opacity-70 text-white border border-blue-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 shadow-inner neon-input-shadow file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-violet-500 file:text-white hover:file:bg-violet-600"
                 required
               />
-              {ktpPhotoFile && (
-                <p className="text-xs text-blue-300 mt-1">File dipilih: {ktpPhotoFile.name}</p>
+              {ktpFile && (
+                <p className="text-xs text-blue-300 mt-1">File dipilih: {ktpFile.name}</p>
               )}
             </div>
           </div>
