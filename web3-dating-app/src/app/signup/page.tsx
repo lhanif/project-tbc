@@ -1,11 +1,6 @@
 "use client"; // This directive is necessary for Next.js App Router client components
 
 import React, { useState } from "react"; // Import useState
-import Image from "next/image";
-
-// Assuming you have your Chain Match logo image in the public folder.
-// Replace this with the actual path to your logo.
-const ChainMatchLogo = "/chain-match-logo.png"; // Example path to your logo
 
 export default function Home() {
   return (
@@ -73,19 +68,6 @@ function Header() {
     // Header component containing the logo and app title
     // Reduced bottom margin (mb) significantly
     <header className="flex flex-col items-center mb-6 md:mb-8"> {/* Adjusted mb */}
-      {/* Chain Match Logo */}
-      <Image
-        src={ChainMatchLogo} // Using the defined logo path
-        alt="Chain Match Logo"
-        width={120} // Further reduced width for compactness
-        height={120} // Further reduced height for compactness
-        className="size-[90px] md:size-[120px] mb-2 drop-shadow-2xl" // Reduced mb
-        style={{
-          filter: "drop-shadow(0px 0px 30px #ff00ff)", // More intense neon pink shadow
-          background: 'radial-gradient(circle at center, rgba(255,0,255,0.4) 0%, transparent 70%)', // Neon pink glow
-          borderRadius: '50%', // Make it circular if the logo is square
-        }}
-      />
 
       <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-1 text-white text-center drop-shadow-lg" // Reduced text size and bottom margin
           style={{ textShadow: "0 0 10px #ff00ff, 0 0 20px #00ffff" }}> {/* Neon text shadow */}
@@ -397,80 +379,3 @@ function SignUpForm() {
     </div>
   );
 }
-
-
-// Keyframe animations for the neon effects (kept for reference, assume in global CSS)
-/*
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-}
-
-@keyframes pulse-border {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 0, 255, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(255, 0, 255, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 0, 255, 0);
-  }
-}
-
-.neon-input-shadow {
-  box-shadow: 0 0 5px #00ffff;
-}
-.neon-input-shadow:focus {
-  box-shadow: 0 0 10px #ff00ff;
-}
-
-.neon-button-shadow {
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.6), 0 0 25px rgba(0, 255, 255, 0.6);
-}
-.neon-button-shadow:hover {
-  box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 35px rgba(0, 255, 255, 0.8);
-}
-
-.neon-card-glow {
-  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5);
-}
-.neon-card-glow:hover {
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 25px rgba(0, 255, 255, 0.7);
-}
-
-@keyframes bounceSlow {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-.animate-blob {
-  animation: blob 7s infinite cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-.animate-pulse-border {
-  animation: pulse-border 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
-}
-*/

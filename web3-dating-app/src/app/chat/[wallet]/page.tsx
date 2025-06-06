@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import ChatBubble from '@/components/ChatBubble'; // Ensure this path is correct
+import SendButton from '@/components/sendButton';
+import { useActiveAccount } from 'thirdweb/react';
 
 interface ChatMsg {
   from: string;
@@ -12,6 +14,7 @@ interface ChatMsg {
 
 export default function ChatPage() {
   const router = useRouter();
+  const account = useActiveAccount();
   const pathname = usePathname();
   // Extracts the last segment of the URL, e.g., 'some-wallet-id' from '/chat/some-wallet-id'
   const peerWallet = pathname.split('/').pop() || '';
@@ -20,7 +23,7 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // This should ideally come from a user context or authentication
-  const myWallet = '1'; // Placeholder for the actual user's wallet ID
+  const myWallet = account?.address; // Placeholder for the actual user's wallet ID
 
   // Log the peer wallet for debugging purposes
   console.log('Chatting with:', peerWallet);
@@ -55,9 +58,9 @@ export default function ChatPage() {
   const handleSend = async () => {
     if (!input.trim()) return; // Prevent sending empty messages
 
-    const newMsg = {
-      from: myWallet,
-      to: peerWallet,
+    const newMsg = { 
+      from: "1",
+      to: "0x03e9BB1D7B78aBEE7DE2B12A6c61D82e6A2115fb",
       text: input.trim(),
       // createdAt: new Date().toISOString(), // You might want to add a client-side timestamp
     };
@@ -142,6 +145,10 @@ export default function ChatPage() {
         >
           Kirim
         </button>
+        <SendButton
+          account ={account?.address || ''}
+          recipient={peerWallet}
+        />
       </div>
     </main>
   );

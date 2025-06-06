@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { wallet: string } } // Dynamic route parameters, e.g., the wallet ID
 ) {
   await connectToDatabase();
-  const { wallet: peerWallet } = params; // The wallet from the URL path
+  const { wallet: peerWallet } = await params; // The wallet from the URL path
 
   const myWallet = '1'; 
 
@@ -36,7 +36,7 @@ export async function POST(
   { params }: { params: { wallet: string } } // Dynamic route parameters
 ) {
   await connectToDatabase();
-  const { wallet: peerWallet } = params; // The wallet from the URL path
+  const { wallet: peerWallet } = await params; // The wallet from the URL path
 
   try {
     const body = await request.json(); // Parse the JSON body of the request

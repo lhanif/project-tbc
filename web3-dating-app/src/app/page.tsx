@@ -3,10 +3,31 @@
 import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
 import thirdwebIcon from "@public/thirdweb.svg"; // Assuming you still want to use this icon for branding
-import { client } from "./client";
-import Verify from "@/components/verify";
+import { client, checkIfUserIsVerified } from "./client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useActiveAccount } from "thirdweb/react";
 
 export default function Home() {
+
+  const router = useRouter();
+  const account = useActiveAccount();
+
+  useEffect(() => {
+  const checkUser = async () => {
+    if (account) {
+      const isVerified = await checkIfUserIsVerified(account.address);
+      if (isVerified) {
+        router.push("/signup");
+      } else {
+        router.push("/signup");
+      }
+    }
+  };
+
+  checkUser();
+}, [account, router]);
+
   return (
     <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
       <div className="py-20 flex flex-col items-center">
@@ -24,7 +45,6 @@ export default function Home() {
             }}
           />
         </div>
-        <Verify userAddress="0x03e9BB1D7B78aBEE7DE2B12A6c61D82e6A2115fb"/>
         <HowItWorks />
       </div>
     </main>
