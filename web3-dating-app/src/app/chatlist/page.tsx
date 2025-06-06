@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"; // Import useState
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 
 // Assuming you have your Chain Match logo image in the public folder.
 const ChainMatchLogo = "/chain-match-logo.png"; // Example path to your logo
@@ -16,37 +17,43 @@ const placeholderChatImage5 = "https://placehold.co/100x100/32CD32/FFF?text=User
 
 // Interface for a chat contact
 interface ChatContact {
-  id: number;
-  name: string;
-  imageUrl: string;
-  lastMessage?: string; // Optional: for displaying a snippet
-  lastMessageTime?: string; // Optional: for displaying time
+  wallet: string;       // Wallet jadi pengganti "id"
+  fullName: string;
+  imageUrl?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
 }
 
-export default function ChatListPage() { // Renamed from Home to ChatListPage
-  // Sample chat contacts
+const userWalletSaya = "1";
+
+export default function ChatListPage() {
   const [chatContacts, setChatContacts] = useState<ChatContact[]>([]);
-  const userIdSaya = "1";
-  
+  const router = useRouter();
+
   useEffect(() => {
     async function fetchChatList() {
       try {
-        const res = await fetch(`/api/match?userIdSaya=${userIdSaya}`);
+        // Ambil daftar pasangan (match) dari API
+        const res = await fetch(`/api/match?userIdSaya=${userWalletSaya}`);
         if (!res.ok) throw new Error("Gagal fetch daftar match");
 
         const data = await res.json();
-        const pasanganIds = data.pasangan;
 
-        // Simulasikan ambil detail user dari pasanganIds
-        const fakeProfiles: ChatContact[] = pasanganIds.map((id: string, idx: number) => ({
-          id,
-          name: `User ${idx + 1}`,
-          imageUrl: "",
+        // pasangan adalah array objek { wallet, fullName }
+        const pasanganList: ChatContact[] = data.pasangan || [];
+
+        // Jika ingin ambil detail lebih lanjut per user bisa lakukan fetch detail per wallet di sini,
+        // misal mengambil imageUrl, lastMessage dll. Contoh sederhana pakai data yang sudah ada:
+
+        // Tambahkan properti default lainnya supaya tampilan lebih lengkap
+        const contactsWithDefaults = pasanganList.map(pasangan => ({
+          ...pasangan,
+          imageUrl: pasangan.imageUrl || "",    // kalau ada URL foto
           lastMessage: "Belum ada pesan",
           lastMessageTime: "Just now",
         }));
 
-        setChatContacts(fakeProfiles);
+        setChatContacts(contactsWithDefaults);
       } catch (err) {
         console.error("Gagal mengambil daftar chat:", err);
       }
@@ -55,25 +62,19 @@ export default function ChatListPage() { // Renamed from Home to ChatListPage
     fetchChatList();
   }, []);
 
-  // Function to simulate navigating to a specific chat (e.g., /chat/[id])
-  const handleOpenChat = (contactId: number, contactName: string) => {
-    alert(`Membuka chat dengan ${contactName} (ID: ${contactId})`); // Placeholder for actual navigation
-    console.log(`Navigating to chat with ${contactName}`);
-    // In a real app, you'd use router.push(`/chat/${contactId}`);
+  const handleOpenChat = (wallet: string, fullName: string) => {
+    console.log(`Navigasi ke chat dengan wallet ${wallet}`);
+    router.push(`/chat/${wallet}`) 
   };
 
-  // Function to simulate going back to the home/swipe page
   const handleGoBack = () => {
-    alert("Kembali ke Halaman Utama/Swipe!"); // Placeholder for actual navigation
-    console.log("Going back to main page.");
-    // In a real app, you'd use router.push('/'); or router.back();
+    console.log("Kembali ke halaman utama");
+    router.push('/home')
   };
+
 
   return (
-    // Main container now uses h-screen w-screen for full screen,
-    // flex items-center justify-center for perfect centering,
-    // and overflow-hidden to prevent scrolling.
-    // Background gradient and neon blobs for visual effect.
+
     <main className="relative h-screen w-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
       {/* Background circles/blobs for neon effect */}
       <div className="absolute inset-0 z-0">
@@ -105,7 +106,7 @@ export default function ChatListPage() { // Renamed from Home to ChatListPage
             <div className="divide-y divide-purple-800">
               {chatContacts.map(contact => (
                 <ChatListItem 
-                  key={contact.id} 
+                  key={contact.wallet} 
                   contact={contact} 
                   onOpenChat={handleOpenChat} 
                 />
@@ -157,7 +158,7 @@ function Header() {
     // Header component containing the logo and app title
     <header className="flex flex-col items-center mb-6"> {/* Adjusted mb */}
       {/* Chain Match Logo */}
-      <Image
+      {/* <Image
         src={ChainMatchLogo} // Using the defined logo path
         alt="Chain Match Logo"
         width={90} // Compact logo size
@@ -168,7 +169,7 @@ function Header() {
           background: 'radial-gradient(circle at center, rgba(255,0,255,0.4) 0%, transparent 70%)', // Neon pink glow
           borderRadius: '50%', // Make it circular if the logo is square
         }}
-      />
+      /> */}
 
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-1 text-white text-center drop-shadow-lg" // Reduced text size
           style={{ textShadow: "0 0 8px #ff00ff, 0 0 15px #00ffff" }}> {/* Neon text shadow */}
@@ -186,19 +187,19 @@ function Header() {
 // New Component: ChatListItem
 interface ChatListItemProps {
   contact: ChatContact;
-  onOpenChat: (id: number, name: string) => void;
+  onOpenChat: (wallet: string, name: string) => void;
 }
 
 function ChatListItem({ contact, onOpenChat }: ChatListItemProps) {
   return (
     <div
-      onClick={() => onOpenChat(contact.id, contact.name)}
+      onClick={() => onOpenChat(contact.wallet, contact.fullName)}
       className="flex items-center p-3 md:p-4 cursor-pointer hover:bg-gray-800 transition-colors duration-200 border-b border-pink-700 last:border-b-0"
     >
       <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border border-blue-500 flex-shrink-0">
         <Image
-          src={contact.imageUrl}
-          alt={contact.name}
+          src={contact.imageUrl ?? ""}
+          alt={contact.fullName}
           layout="fill"
           objectFit="cover"
           className="rounded-full"
@@ -211,7 +212,7 @@ function ChatListItem({ contact, onOpenChat }: ChatListItemProps) {
       </div>
       <div className="ml-3 flex-grow overflow-hidden">
         <h3 className="text-white text-base md:text-lg font-semibold truncate" style={{ textShadow: "0 0 5px #00ffff" }}>
-          {contact.name}
+          {contact.fullName}
         </h3>
         {contact.lastMessage && (
           <p className="text-pink-300 text-sm truncate" style={{ textShadow: "0 0 3px #ff00ff" }}>

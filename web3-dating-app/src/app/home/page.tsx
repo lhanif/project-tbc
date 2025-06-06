@@ -1,23 +1,14 @@
 "use client"; // This directive is necessary for Next.js App Router client components
 
-import React, { useState } from "react"; // Import useState
+import React, { useState, useEffect} from "react"; // Import useState
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-// Assuming you have your Chain Match logo image in the public folder.
-// Replace this with the actual path to your logo.
 const ChainMatchLogo = "/chain-match-logo.png"; // Example path to your logo
-
-// Placeholder images for match cards. Replace with actual image URLs if available.
-// For now, using placeholder service.
-const placeholderProfileImage1 = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fbanggaikep.go.id%2Fportal%2Fkabar-gembira-presiden-ri-jokowi-bakal-kunjungi-bangkep%2F&psig=AOvVaw3b86MRFtBFdekpNsA-ZhMU&ust=1749193640404000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCLilu57c2Y0DFQAAAAAdAAAAABAE";
-const placeholderProfileImage2 = "https://placehold.co/400x500/00FFFF/FF00FF?text=Another+Match";
-const placeholderProfileImage3 = "https://placehold.co/400x500/FF00FF/00FFFF?text=New+Match";
-
-
-// Define an interface for MatchCard props (optional but good practice)
+const myWallet = "1";
 interface Match {
-  id: number;
-  name: string;
+  wallet: string;
+  fullName: string;
   age: number;
   city: string;
   imageUrl: string;
@@ -25,20 +16,46 @@ interface Match {
 
 export default function Home() {
   // Array of potential profiles
-  const [allProfiles, setAllProfiles] = useState<Match[]>([
-    { id: 2, name: "Luna", age: 26, city: "Cyber City", imageUrl: "" },
-    { id: 3, name: "Astro", age: 28, city: "Neon District", imageUrl: "" },
-    { id: 4, name: "Kira", age: 24, city: "Data Stream", imageUrl: "" },
-    // Add more profiles here for demonstration
-  ]);
-
+  const [allProfiles, setAllProfiles] = useState<Match[]>([]);
+  const router = useRouter();
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
 
   const currentProfile = allProfiles[currentProfileIndex];
 
-  
+    useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const res = await fetch("/api/get-allusers");
+        const users = await res.json();
+
+        const filtered = users
+          .filter((user: any) => user.wallet !== myWallet)
+          .map((user: any) => {
+            // Hitung umur
+            const dob = new Date(user.dob);
+            const age =
+              new Date().getFullYear() - dob.getFullYear();
+
+            return {
+              wallet: user.wallet,
+              fullName: user.fullName,
+              age,
+              city: user.city,
+              imageUrl: ``, // asumsi gambar disimpan di IPFS
+            };
+          });
+
+        setAllProfiles(filtered);
+      } catch (err) {
+        console.error("Gagal mengambil profil:", err);
+      }
+    };
+
+    fetchProfiles();
+  }, []);
+
   const handleSwipe = async (direction: 'like' | 'dislike') => {
-  console.log(`Swiped ${direction} on ${currentProfile?.name || 'unknown profile'}`);
+  console.log(`Swiped ${direction} on ${currentProfile?.fullName || 'unknown profile'}`);
 
   if (direction === 'like' && currentProfile) {
     try {
@@ -48,8 +65,8 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userIdSaya: '1', // ganti nanti dengan user id dari auth
-          userIdPasangan: currentProfile.id.toString(),
+          userIdSaya: myWallet, // ganti nanti dengan user id dari auth
+          userIdPasangan: currentProfile.wallet.toString(),
         }),
       });
 
@@ -71,7 +88,7 @@ export default function Home() {
 
   // Function to navigate to chat page
   const handleGoToChatPage = () => {
-    alert("Mengarah ke Halaman Chat Anda! (Ini adalah daftar chat dengan match Anda)"); // Placeholder for Next.js router.push('/chat')
+    router.push('/chatlist');
     console.log("Navigasi ke Halaman Chat.");
   };
 
@@ -157,7 +174,7 @@ function MatchCard({ match }: { match: Match }) {
     <div className="relative w-64 h-80 md:w-80 md:h-96 bg-gray-900 bg-opacity-70 rounded-xl shadow-2xl border border-pink-500 overflow-hidden neon-card-glow transform hover:scale-105 transition-all duration-200">
       <Image
         src={match.imageUrl}
-        alt={match.name}
+        alt={match.fullName}
         layout="fill"
         objectFit="cover"
         className="rounded-t-xl"
@@ -170,7 +187,7 @@ function MatchCard({ match }: { match: Match }) {
       />
       <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black to-transparent rounded-b-xl">
         <h3 className="text-white text-xl md:text-2xl font-bold" style={{ textShadow: "0 0 8px #00ffff" }}>
-          {match.name}, {match.age}
+          {match.fullName}, {match.age}
         </h3>
         <p className="text-pink-300 text-sm" style={{ textShadow: "0 0 5px #ff00ff" }}>
           {match.city}
