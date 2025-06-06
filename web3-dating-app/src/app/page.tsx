@@ -40,8 +40,8 @@ export default function Home() {
           <ConnectButton
             client={client}
             appMetadata={{
-              name: "Chain Match", // Dating app name
-              url: "https://web3love.com", // Your dating app URL
+              name: "Chain Match",
+              url: "https://web3love.com",
             }}
           />
         </div>
@@ -55,11 +55,11 @@ function Header() {
   return (
     <header className="flex flex-col items-center mb-12 md:mb-16">
       <Image
-        src={thirdwebIcon} // You might want to replace this with a dating app specific logo
+        src={thirdwebIcon}
         alt="Web3Love Logo"
         className="size-[120px] md:size-[150px] mb-4"
         style={{
-          filter: "drop-shadow(0px 0px 24px #e91e63a8)", // Pinkish shadow for dating app theme
+          filter: "drop-shadow(0px 0px 24px #e91e63a8)", 
         }}
       />
 
@@ -90,13 +90,13 @@ function HowItWorks() {
         <ArticleCard
           title="2. Create Your Profile"
           description="Build your on-chain profile with your interests and preferences."
-          icon="✨" // Sparkles emoji
+          icon="✨"
         />
 
         <ArticleCard
           title="3. Find Your Match"
           description="Discover compatible profiles and start building meaningful connections."
-          icon="💘" // Heart with arrow emoji
+          icon="💘"
         />
       </div>
     </div>

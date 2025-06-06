@@ -6,9 +6,9 @@ import { parseEther } from "ethers";
 import { sepolia } from "thirdweb/chains";
 import { client } from "@/app/client";
 
-// Define the props type
+
 interface SendEthButtonProps {
-  account: any; // Ideally this should be typed better, e.g., from thirdweb types
+  account: any;
   recipient: string;
 }
 
@@ -39,7 +39,7 @@ export default function SendEthButton({ account, recipient }: SendEthButtonProps
       setSuccess("Transaction successful!");
     } catch (err) {
       console.error(err);
-      setSuccess("Transaction successful!");
+      setError("Transaction failed.");
     } finally {
       setLoading(false);
     }
